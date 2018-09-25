@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图片轮播图</title>
+</head>
+<style type="text/css">
+    img {
+        width: 100%;
+    }
+
+    .liImg {
+        width: 900px;
+        float: left;
+        list-style: none;
+    }
+
+    .ulImg {
+        width: 90000000px;
+        padding: 0;
+        margin: 0;
+        /*动画时间 2s*/
+        transition: all 2s;
+    }
+
+    .main {
+        width: 900px;
+        overflow: hidden;
+        position: relative;
+        margin: 0 auto;
+    }
+
+    .arrows {
+        z-index: 999;
+        position: absolute;
+        padding-top: 350px;
+        width: 900px;
+    }
+
+    .arrow {
+        cursor: pointer;
+        background-color: rgba(136, 136, 136, 0.3);
+        font-size: 45px;
+        color: rgba(136, 136, 136, 0.3);
+    }
+
+    /*鼠标经过时更改颜色*/
+    .arrow:hover {
+        color: rgba(9, 187, 7, 0.5);
+        background-color: rgba(9, 187, 7, 0.5);
+    }
+
+    .btnDiv {
+        width: 960px;
+        height: 9px;
+        margin: 13px auto;
+    }
+
+    .parent {
+        margin-left: 23%;
+    }
+
+    .divBtn {
+        float: left;
+        border-radius: 150px;
+        background-color: grey;
+        width: 30px;
+        height: 7px;
+        margin-left: 15px;
+    }
+
+    .divBtn:hover {
+        background-color: red;
+    }
+
+</style>
+<body>
+
+
+<div class="main">
+    <!--浮动在图片上的左右按钮-->
+    <div class="arrows">
+        <span title="上一张" class="arrow"> << </span>
+        <span title="下一张" class="arrow" style="float: right"> >> </span>
+    </div>
+    <ul class="ulImg">
+        <li class="liImg"><img src="./images/pic01.jpg"></li>
+        <li class="liImg"><img src="./images/pic02.jpg"></li>
+        <li class="liImg"><img src="./images/pic03.jpg"></li>
+        <li class="liImg"><img src="./images/pic04.jpg"></li>
+        <li class="liImg"><img src="./images/pic05.jpg"></li>
+        <li class="liImg"><img src="./images/pic06.jpg"></li>
+        <li class="liImg"><img src="./images/pic07.jpg"></li>
+        <li class="liImg"><img src="./images/pic08.jpg"></li>
+        <li class="liImg"><img src="./images/pic09.jpg"></li>
+        <li class="liImg"><img src="./images/pic10.jpg"></li>
+        <li class="liImg"><img src="./images/pic11.jpg"></li>
+    </ul>
+</div>
+<!--底部按钮，可以利用css更改样式-->
+<div class="btnDiv">
+    <div class="parent"></div>
+</div>
+<script>
+    /**
+     * 全局变量 count isGo timer
+     * */
+//    循环的次数
+    var count = 0;
+    //    循环的方向
+    var isGo = false;
+    //    循环的时间
+    var timer;
+
+    /**
+     * 控制图片轮播
+     * */
+    function showTime() {
+        var ulImg = document.getElementsByClassName('ulImg')[0];
+        var liImg = document.getElementsByClassName("liImg");
+        timer = setInterval(function () {
+            if (isGo == false) {
+                count++;
+                ulImg.style.transform = "translate(" + -900 * count + "px)";
+                if (count >= liImg.length - 1) {
+                    count = liImg.length - 1;
+                    isGo = true;
+                }
+            } else {
+                count--;
+                ulImg.style.transform = "translate(" + -900 * count + "px)";
+                if (count <= 0) {
+                    count = 0;
+                    isGo = false;
+                }
+            }
+            divBtnColor();
+        }, 2500);
+    }
+
+    /**
+     * 控制上一页和下一页功能
+     * */
+    function arrow() {
+        var arrow = document.getElementsByClassName('arrow');
+        var ulImg = document.getElementsByClassName('ulImg')[0];
+        var liImg = document.getElementsByClassName("liImg");
+        for (var i = 0; i < arrow.length; ++i) {
+            //当鼠标经过的时候，清除定时器timer
+            arrow[i].onmouseover = function () {
+                clearInterval(timer);
+            };
+            //当鼠标离开的时候，继续图片轮播
+            arrow[i].onmouseout = function () {
+                showTime();
+            };
+            //当点击的时候
+            arrow[i].onclick = function () {
+                if (this.title == "下一张") {
+                    count++;
+                    if (count >= liImg.length - 1) {
+                        count = 0;
+                    }
+                } else {
+                    count--;
+                    if (count <= 0) {
+                        count = liImg.length - 1;
+                    }
+                }
+                ulImg.style.transform = "translate(" + -900 * count + "px)";
+                divBtnColor();
+            }
+        }
+    }
+
+    //
+    <!--根据图片的数量，动态创建底部按钮-->
+    function createDivBtn() {
+        var divParent = document.getElementsByClassName('parent')[0];
+        var chlidBtn = document.createElement('div');
+        chlidBtn.className = "divBtn";
+        divParent.appendChild(chlidBtn);
+    }
+
+    //    控制底部按钮的颜色
+    function divBtnColor() {
+        var divBtn = document.getElementsByClassName("divBtn");
+        for (var i = 0; i < divBtn.length; ++i) {
+            divBtn[i].style.backgroundColor = "grey";
+        }
+        divBtn[count].style.backgroundColor = "red";
+    }
+
+    //    控制底部按钮触发的事件
+    function divBtnEvent() {
+        var divBtn = document.getElementsByClassName("divBtn");
+        divBtn[0].style.backgroundColor = "red";
+
+        for (var i = 0; i < divBtn.length; ++i) {
+
+//            这句语句重要，用于标记当前选中的
+            divBtn[i].index = i;
+
+            divBtn[i].onmouseover = function () {
+                clearInterval(timer);
+
+                for (var j = 0; j < divBtn.length; ++j) {
+                    divBtn[j].style.backgroundColor = 'grey';
+                }
+
+                divBtn[this.index].style.backgroundColor = 'red';
+
+                if (this.index == divBtn.length - 1) {
+                    isGo = true;
+                }
+                if (this.index == 0) {
+                    isGo = false;
+                }
+                count = this.index;
+                var ulImg = document.getElementsByClassName('ulImg')[0];
+                ulImg.style.transform = "translate(" + -900 * count + "px)";
+            };
+            divBtn[i].onmouseout = function () {
+                showTime();
+            };
+        }
+    }
+
+    window.onload = function () {
+        showTime();
+        var liImg = document.getElementsByClassName("liImg");
+        for (var j = 0; j < liImg.length; ++j) {
+            createDivBtn();
+        }
+        arrow();
+        divBtnEvent();
+
+    }
+</script>
+</body>
+</html>
